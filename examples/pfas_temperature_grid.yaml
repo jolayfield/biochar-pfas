@@ -1,0 +1,27 @@
+# PFAS-sorption study: pyrolysis-temperature x feedstock grid
+# ------------------------------------------------------------
+# Reproduces the structure-generation step of the LCCMR PFAS/biochar workflow.
+# Pyrolysis temperature and feedstock set the oxygen content (O/C), which is the
+# variable hypothesised to control PFAS binding at the biochar surface. The
+# built-in temperature model derives H/C, O/C, and aromaticity for each point.
+#
+# Run with:
+#   biochar-sweep run examples/sweeps/pfas_temperature_grid.yaml
+#
+# Produces 5 x 2 = 10 structures under sweep_out/structures/, plus
+# sweep_out/manifest.csv and sweep_out/manifest.json.
+
+name: pfas_temperature_grid
+output_directory: sweep_out/pfas_temperature_grid
+
+fixed:
+  target_num_carbons: 100
+  charge_method: opls
+
+axes:
+  temperature: [300, 400, 500, 600, 700]
+  feedstock: [softwood, hardwood]
+
+seed: 0
+max_retries: 8
+on_validation_fail: fallback
