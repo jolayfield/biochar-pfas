@@ -1,6 +1,6 @@
 # PFAS-sorption study: pyrolysis-temperature x feedstock grid
 # ------------------------------------------------------------
-# Reproduces the structure-generation step of the LCCMR PFAS/biochar workflow.
+# The structure-generation step of the PFAS/biochar sorption workflow.
 # Pyrolysis temperature and feedstock set the oxygen content (O/C), which is the
 # variable hypothesised to control PFAS binding at the biochar surface. The
 # built-in temperature model derives H/C, O/C, and aromaticity for each point.

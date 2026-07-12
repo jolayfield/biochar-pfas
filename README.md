@@ -36,7 +36,7 @@ pip install -e .                                       # this package
 
  2. biochar-pfas build-inputs ─▶ molecules.txt + build_pfas_ligands.sh
                                           ─── scp ──▶ 3. run build_pfas_ligands.sh
-                                                         (py37 env, BOSSdir set)
+                                                         (conda env: ligpargen + BOSS)
                                                          ─▶ atomtypes.itp +
                                                             PFOA/PFOS/PFBS .itp/.gro
                                           ◀── scp back ──
