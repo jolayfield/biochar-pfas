@@ -24,7 +24,7 @@ biochar-pfas  ──imports──▶  biochar   (>=0.4.0, needs the md_setup Pre
 
 `biochar-pfas` consumes `biochar` only through its public `md_setup` API. The
 installed `biochar` (>=0.4.0) must expose all of the following symbols from
-`biochar.md_setup`, or setup will fail at import time:
+`biochar.md_setup`, or setup fails fast with a clear error (see below):
 
 | Symbol | Used by | For |
 |---|---|---|
@@ -79,7 +79,20 @@ biochar-pfas build-inputs --species PFOA PFOS PFBS --output-dir pfas_build
 #    scp the resulting pfas_ligands_gmx/ directory back.
 ```
 
-### 2. Set up a biochar+PFAS run directory (Python API)
+### 2. Set up a biochar+PFAS run directory
+
+From the CLI (placements are `--place SPECIES:COUNT[:TRY]`, repeatable):
+
+```bash
+biochar-pfas setup \
+  --gro T300_softwood.gro --top T300_softwood.top \
+  --ligand-system-dir pfas_ligands_gmx \
+  --output-dir md_runs/T300_softwood_PFOA_PFOS \
+  --place PFOA:4 --place PFOS:2:250 \
+  --ion-profile mn_calcareous_default
+```
+
+or the Python API:
 
 ```python
 from biochar_pfas import LigandPlacement, setup_pfas_md
@@ -101,13 +114,15 @@ Under the hood this merges the biochar topology with the ligand system, builds a
 which anneals the bare surface, inserts the PFAS ligand(s) into its box, then
 solvates + adds ions + wet-equilibrates against the merged topology.
 
+A full setup-only walk-through is in [`examples/pfas_binding/`](examples/pfas_binding/).
+
 ## Modules
 
 | Module | Responsibility |
 |---|---|
 | `biochar_pfas/pfas_ligands.py` | PFAS species table, LigParGen input rendering, biochar+ligand topology merge, `build_pre_solvation_stage` adapter |
 | `biochar_pfas/orchestrate.py` | `setup_pfas_md` — compose merge + `biochar.md_setup` |
-| `biochar_pfas/cli.py` | `biochar-pfas` command (`build-inputs`) |
+| `biochar_pfas/cli.py` | `biochar-pfas` command (`build-inputs`, `setup`) |
 
 ## Tests
 
