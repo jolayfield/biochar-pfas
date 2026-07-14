@@ -12,6 +12,12 @@ the insertion to biochar's generic `PreSolvationStage` seam.
 Nothing here invokes `gmx` or `ligpargen` — it only writes the files/scripts you
 then run yourself (setup only).
 
+## Documentation
+
+- [Usage guide](docs/usage.md) — CLI + Python API reference, recipes, troubleshooting.
+- [Workflow runbook](docs/pfas-workflow-runbook.md) — the local↔cluster operator procedure.
+- [Worked example](examples/pfas_binding/) — a full setup-only walk-through.
+
 ## Dependency direction
 
 ```
