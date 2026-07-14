@@ -12,6 +12,7 @@ from pathlib import Path
 
 from .pfas_ligands import (
     PFAS_SPECIES,
+    PFASLigandError,
     get_pfas_species,
     render_ligpargen_build_script,
     render_ligpargen_molecules_txt,
@@ -51,7 +52,12 @@ def main(argv=None) -> int:
     bi.set_defaults(func=_build_inputs)
 
     args = parser.parse_args(argv)
-    return args.func(args)
+    try:
+        return args.func(args)
+    except PFASLigandError as exc:
+        # Turn a bad --species (or other spec error) into a clean argparse-style
+        # failure (message on stderr, exit code 2) instead of a raw traceback.
+        parser.error(str(exc))
 
 
 if __name__ == "__main__":

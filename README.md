@@ -20,6 +20,26 @@ biochar-pfas  ──imports──▶  biochar   (>=0.4.0, needs the md_setup Pre
 
 `biochar` never imports `biochar-pfas`.
 
+### `biochar` seam contract
+
+`biochar-pfas` consumes `biochar` only through its public `md_setup` API. The
+installed `biochar` (>=0.4.0) must expose all of the following symbols from
+`biochar.md_setup`, or setup will fail at import time:
+
+| Symbol | Used by | For |
+|---|---|---|
+| `MDSetupConfig` | `orchestrate.setup_pfas_md` | run configuration; its `pre_solvation_stage` slot is where PFAS insertion is spliced in |
+| `PreSolvationStage` | `pfas_ligands.build_pre_solvation_stage` | the generic seam that carries the ligand insertion + merged topology into the pipeline |
+| `MoleculeInsertion` | `pfas_ligands.build_pre_solvation_stage` | one per placed species (`gro_file`, `n_copies`, `n_try`) |
+| `setup_one_structure` | `orchestrate.setup_pfas_md` | renders the run directory from a structure + config |
+
+The seam is checked at the point of use (not at `import biochar_pfas`) by
+`require_biochar_md_setup()`: if `biochar` is not importable, or is too old to
+expose every symbol above, it raises `BiocharSeamError` (a subclass of
+`ImportError`) naming exactly what is missing and the required version — rather
+than letting a bare `ImportError` or `AttributeError` surface deep in the call
+stack. `import biochar_pfas` itself never imports `biochar`.
+
 ## Install (dev)
 
 ```bash
@@ -28,6 +48,11 @@ pip install -e .                                       # this package
 ```
 
 ## Workflow
+
+For the full operator procedure across the local/cluster boundary — exact
+handoff sequence, expected files before and after each cluster step, cluster
+prerequisites, and a pre-run review checklist — see the
+[PFAS workflow runbook](docs/pfas-workflow-runbook.md).
 
 ```
  (local)                                        (cluster, by hand)
