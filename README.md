@@ -33,9 +33,12 @@ installed `biochar` (>=0.4.0) must expose all of the following symbols from
 | `MoleculeInsertion` | `pfas_ligands.build_pre_solvation_stage` | one per placed species (`gro_file`, `n_copies`, `n_try`) |
 | `setup_one_structure` | `orchestrate.setup_pfas_md` | renders the run directory from a structure + config |
 
-These imports are deliberately function-local (not module-level), so a missing
-seam surfaces as a narrow `ImportError` at the point of use rather than breaking
-`import biochar_pfas`.
+The seam is checked at the point of use (not at `import biochar_pfas`) by
+`require_biochar_md_setup()`: if `biochar` is not importable, or is too old to
+expose every symbol above, it raises `BiocharSeamError` (a subclass of
+`ImportError`) naming exactly what is missing and the required version — rather
+than letting a bare `ImportError` or `AttributeError` surface deep in the call
+stack. `import biochar_pfas` itself never imports `biochar`.
 
 ## Install (dev)
 

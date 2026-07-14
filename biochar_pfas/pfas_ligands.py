@@ -325,6 +325,54 @@ def merge_biochar_pfas_topology(
 
 
 # --------------------------------------------------------------------------- #
+# biochar seam contract: the md_setup symbols this package depends on.
+# --------------------------------------------------------------------------- #
+#: `biochar-pfas` consumes `biochar` only through these `biochar.md_setup`
+#: symbols. Kept as data so the fail-fast check and the docs stay in sync.
+REQUIRED_MD_SETUP_SYMBOLS = (
+    "MDSetupConfig",
+    "PreSolvationStage",
+    "MoleculeInsertion",
+    "setup_one_structure",
+)
+
+
+class BiocharSeamError(ImportError):
+    """Raised when the installed `biochar` cannot satisfy the `md_setup` seam
+    this package needs (not importable, or missing a required symbol).
+
+    Subclasses `ImportError` so existing `except ImportError` handlers keep
+    working while callers get a clear, named failure.
+    """
+
+
+def require_biochar_md_setup():
+    """Import `biochar.md_setup` and verify it exposes the seam `biochar-pfas`
+    depends on, failing fast with a clear message if not.
+
+    Returns the imported `biochar.md_setup` module so callers can pull symbols
+    off it directly. Raises `BiocharSeamError` if `biochar` is not importable
+    or is too old to expose every name in `REQUIRED_MD_SETUP_SYMBOLS`.
+    """
+    try:
+        from biochar import md_setup
+    except ImportError as exc:
+        raise BiocharSeamError(
+            "biochar (>=0.4.0) is required but could not be imported "
+            f"({exc}). Install it, e.g. `pip install 'biochar>=0.4.0'`."
+        ) from exc
+
+    missing = [s for s in REQUIRED_MD_SETUP_SYMBOLS if not hasattr(md_setup, s)]
+    if missing:
+        raise BiocharSeamError(
+            f"installed biochar.md_setup is missing the seam biochar-pfas needs: "
+            f"{missing}. biochar-pfas requires biochar>=0.4.0 exposing "
+            f"{list(REQUIRED_MD_SETUP_SYMBOLS)}."
+        )
+    return md_setup
+
+
+# --------------------------------------------------------------------------- #
 # Step 3 (local): adapt a merged ligand system into biochar's generic
 # pre-solvation insertion seam (biochar.md_setup.PreSolvationStage).
 # --------------------------------------------------------------------------- #
@@ -344,7 +392,9 @@ def build_pre_solvation_stage(
     to `merge_result["top_path"]` and are passed through as `extra_files` so
     `setup_one_structure` copies them into the run directory.
     """
-    from biochar.md_setup import PreSolvationStage, MoleculeInsertion
+    md_setup = require_biochar_md_setup()
+    PreSolvationStage = md_setup.PreSolvationStage
+    MoleculeInsertion = md_setup.MoleculeInsertion
 
     merged_top = Path(merge_result["top_path"])
     ligand_dir = merged_top.parent

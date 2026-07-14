@@ -11,6 +11,7 @@ consumed through its public API and its generic `PreSolvationStage` seam.
 from .pfas_ligands import (
     PFASSpecies,
     PFASLigandError,
+    BiocharSeamError,
     PFAS_SPECIES,
     get_pfas_species,
     LigandPlacement,
@@ -18,6 +19,7 @@ from .pfas_ligands import (
     render_ligpargen_build_script,
     merge_biochar_pfas_topology,
     build_pre_solvation_stage,
+    require_biochar_md_setup,
 )
 from .orchestrate import setup_pfas_md
 
@@ -25,6 +27,7 @@ __version__ = "0.1.0"
 __all__ = [
     "PFASSpecies",
     "PFASLigandError",
+    "BiocharSeamError",
     "PFAS_SPECIES",
     "get_pfas_species",
     "LigandPlacement",
@@ -32,5 +35,6 @@ __all__ = [
     "render_ligpargen_build_script",
     "merge_biochar_pfas_topology",
     "build_pre_solvation_stage",
+    "require_biochar_md_setup",
     "setup_pfas_md",
 ]

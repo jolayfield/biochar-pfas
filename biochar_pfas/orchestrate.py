@@ -23,6 +23,7 @@ from .pfas_ligands import (
     LigandPlacement,
     build_pre_solvation_stage,
     merge_biochar_pfas_topology,
+    require_biochar_md_setup,
 )
 
 
@@ -53,7 +54,9 @@ def setup_pfas_md(
 
     Returns the created run directory `Path`.
     """
-    from biochar.md_setup import MDSetupConfig, setup_one_structure
+    # Fail fast with a clear message if the installed biochar can't satisfy the
+    # md_setup seam this driver needs, before doing any merge work.
+    md_setup = require_biochar_md_setup()
 
     # Merge into a scratch dir; setup_one_structure copies the stage's
     # extra_files (merged.top + ligand .itp/.gro) into the run directory, so the
@@ -63,7 +66,9 @@ def setup_pfas_md(
             top_path, ligand_system_dir, placements, scratch
         )
         stage = build_pre_solvation_stage(placements, merge_result, name=stage_name)
-        cfg = dataclasses.replace(config or MDSetupConfig(), pre_solvation_stage=stage)
-        return setup_one_structure(
+        cfg = dataclasses.replace(
+            config or md_setup.MDSetupConfig(), pre_solvation_stage=stage
+        )
+        return md_setup.setup_one_structure(
             gro_path, top_path, output_dir, label=label, config=cfg
         )
